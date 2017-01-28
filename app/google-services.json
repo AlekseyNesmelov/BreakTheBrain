@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "661969184142",
+    "firebase_url": "https://breakthebrain-a7c43.firebaseio.com",
+    "project_id": "breakthebrain-a7c43",
+    "storage_bucket": "breakthebrain-a7c43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661969184142:android:db361e361363a26d",
+        "android_client_info": {
+          "package_name": "com.breakthebrain"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661969184142-camo2hslct5neeb065etn4tkvrmh0tli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5Pp2oMj9isJ2K-eC9hQ3Z6E53al0LnR4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
