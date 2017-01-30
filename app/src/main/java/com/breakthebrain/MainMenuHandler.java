@@ -3,12 +3,10 @@ package com.breakthebrain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
     private DrawableScene mScene;
@@ -20,8 +18,7 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
     private GameListener mLevelListener;
     private Context mContext;
 
-    private Map<DrawableObject, Bitmap> mObjectsToLoadTextures = new HashMap<>();
-    private List<TextureTemplate> mObjectsToLoadAnimationTextures = new ArrayList<>();
+    private List<TextureTemplate> mTexturesToLoad = new ArrayList<>();
 
     public MainMenuHandler(final Context context, final GameListener levelListener) {
         mContext = context;
@@ -29,35 +26,34 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public void processBeforeDraw(final int matrixLocation, final float[] matrix, final int colorLocation,
-                                  final float scaleFactorX, final float scaleFactorY) {
+    public void processBeforeDraw(final int matrixLocation, final float[] matrix) {
     }
 
     @Override
-    public void processAfterDraw(int matrixLocation, float[] matrix, int colorLocation, float scaleFactorX, float scaleFactorY) {
+    public void processAfterDraw(int matrixLocation, float[] matrix) {
     }
 
     @Override
-    public void processTouch(MotionEvent e) {
+    public void processTouch(final MotionEvent e) {
         final float x = e.getX();
         final float y = e.getY();
-        final float glX = SceneGLRenderer.getXByScreenX(x);
-        final float glY = SceneGLRenderer.getYByScreenY(y);
+        final float glX = Game.getXByScreenX(x);
+        final float glY = Game.getYByScreenY(y);
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
             if (mStartButton.isInside(glX, glY)) {
-                mStartButton.animateLoop("press");
+                mStartButton.setState(Const.BUTTON_PRESSED_STATE);
                 mIsStartPressed = true;
             } else if (mExitButton.isInside(glX, glY)) {
-                mExitButton.animateLoop("press");
+                mExitButton.setState(Const.BUTTON_PRESSED_STATE);
                 mIsExitPressed = true;
             }
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
-            mStartButton.stopAnimation();
-            mExitButton.stopAnimation();
+            mStartButton.setState(Const.NORMAL_STATE);
+            mExitButton.setState(Const.NORMAL_STATE);
             if (mIsStartPressed && mStartButton.isInside(glX, glY)) {
                 mLevelListener.onStartButtonPressed();
             } else if (mIsExitPressed && mExitButton.isInside(glX, glY)) {
-                mLevelListener.onExit();
+                ((AppCompatActivity)mContext).finish();
             }
             mIsStartPressed = false;
             mIsExitPressed = false;
@@ -66,7 +62,6 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
 
     @Override
     public void processLevelThread() {
-
     }
 
     @Override
@@ -75,47 +70,43 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public void initLevel() {
+    public void init() {
         mScene = new DrawableScene(1);
 
-        mMat = new DrawableObject(2, 2);
+        // Mat
+        mMat = new DrawableObject(2, 2, DrawableObject.NORMAL_SPRITE);
         final Bitmap iconMat = Utils.getResizedBitmap(BitmapFactory.decodeResource(mContext.getResources(),
-                R.drawable.mat), SceneGLRenderer.getScreenWidth(), SceneGLRenderer.getScreenHeight());
-        mObjectsToLoadTextures.put(mMat, iconMat);
+                R.drawable.mat), Game.getScreenWidth(), Game.getScreenHeight());
+        final TextureTemplate matTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconMat, mMat);
+        mTexturesToLoad.add(matTemplate);
         mScene.addToLayer(0, mMat);
 
-        mStartButton = new DrawableObject(0.7f, 0.7f);
-        mStartButton.makeSquare();
+        // Start button.
+        mStartButton = new DrawableObject(0.7f, 0.7f, DrawableObject.SQUARE_SPRITE);
         final Bitmap iconStartButton = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.start_button);
-        mObjectsToLoadTextures.put(mStartButton, iconStartButton);
+        final Bitmap iconStartButtonPressed = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.start_button_pressed);
+        final TextureTemplate startButtonTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconStartButton, mStartButton);
+        final TextureTemplate startButtonPressedTemplate = new TextureTemplate(Const.BUTTON_PRESSED_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconStartButtonPressed, mStartButton);
+        mTexturesToLoad.add(startButtonTemplate);
+        mTexturesToLoad.add(startButtonPressedTemplate);
         mScene.addToLayer(0, mStartButton);
 
-        final Bitmap startButtonAnimation = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.start_button_pressed);
-        final TextureTemplate startButtonAnimationTemplate = new TextureTemplate();
-        startButtonAnimationTemplate.bitmap = startButtonAnimation;
-        startButtonAnimationTemplate.animationName = "press";
-        startButtonAnimationTemplate.object = mStartButton;
-        mObjectsToLoadAnimationTextures.add(startButtonAnimationTemplate);
-
-        mExitButton = new DrawableObject(0.3f, 0.3f);
+        // Exit button.
+        mExitButton = new DrawableObject(0.3f, 0.3f, DrawableObject.SQUARE_SPRITE);
         mExitButton.setX(0.6f);
         mExitButton.setY(0.8f);
-        mExitButton.makeSquare();
         final Bitmap iconExitButton = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.exit_button);
-        mObjectsToLoadTextures.put(mExitButton, iconExitButton);
+        final Bitmap iconExitButtonPressed = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.exit_button_pressed);
+        final TextureTemplate exitButtonTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconExitButton, mExitButton);
+        final TextureTemplate exitButtonPressedTemplate = new TextureTemplate(Const.BUTTON_PRESSED_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconExitButtonPressed, mExitButton);
+        mTexturesToLoad.add(exitButtonTemplate);
+        mTexturesToLoad.add(exitButtonPressedTemplate);
         mScene.addToLayer(0, mExitButton);
-
-        final Bitmap exitButtonAnimation = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.exit_button_pressed);
-        final TextureTemplate exitButtonAnimationTemplate = new TextureTemplate();
-        exitButtonAnimationTemplate.bitmap = exitButtonAnimation;
-        exitButtonAnimationTemplate.animationName = "press";
-        exitButtonAnimationTemplate.object = mExitButton;
-        mObjectsToLoadAnimationTextures.add(exitButtonAnimationTemplate);
-    }
-
-    @Override
-    public void callLoaded() {
-        mLevelListener.onMenuLoaded();
     }
 
     @Override
@@ -124,12 +115,7 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public Map<DrawableObject, Bitmap> getObjectsToLoadTextures() {
-        return mObjectsToLoadTextures;
-    }
-
-    @Override
-    public List<TextureTemplate> getObjectsToLoadAnimationTextures() {
-        return mObjectsToLoadAnimationTextures;
+    public List<TextureTemplate> getTexturesToLoad() {
+        return mTexturesToLoad;
     }
 }

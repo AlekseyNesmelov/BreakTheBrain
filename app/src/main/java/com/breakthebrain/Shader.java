@@ -20,14 +20,9 @@ public class Shader {
             "precision mediump float;\n" +
                     "uniform sampler2D u_TextureUnit;\n" +
                     "varying vec2 v_Texture;\n" +
-                    "uniform vec4 u_Color;\n" +
                     "void main()\n" +
                     "{\n" +
-                    "    if (u_Color.x == 0.0 && u_Color.y == 0.0 && u_Color.z == 0.0) {\n" +
-                    "        gl_FragColor = texture2D(u_TextureUnit, v_Texture);\n" +
-                    "    } else {" +
-                    "        gl_FragColor = u_Color;" +
-                    "    }" +
+                    "    gl_FragColor = texture2D(u_TextureUnit, v_Texture);\n" +
                     "}";
 
     /**

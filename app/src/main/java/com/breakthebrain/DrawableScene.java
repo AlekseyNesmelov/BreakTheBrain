@@ -47,8 +47,8 @@ public class DrawableScene {
             for (int p = 0; p < pointCounter; p++) {
                 final float x = e.getX(p);
                 final float y = e.getY(p);
-                final float glX = SceneGLRenderer.getXByScreenX(x);
-                final float glY = SceneGLRenderer.getYByScreenY(y);
+                final float glX = Game.getXByScreenX(x);
+                final float glY = Game.getYByScreenY(y);
                 final DrawableObject object = mDraggableObjects.get(p);
                 if (object != null) {
                     object.setX(glX);
@@ -60,8 +60,8 @@ public class DrawableScene {
             final int actionIndex = e.getActionIndex();
             final float x = e.getX(actionIndex);
             final float y = e.getY(actionIndex);
-            final float glX = SceneGLRenderer.getXByScreenX(x);
-            final float glY = SceneGLRenderer.getYByScreenY(y);
+            final float glX = Game.getXByScreenX(x);
+            final float glY = Game.getYByScreenY(y);
             for (final DrawableLayer layer : mLayers) {
                 final DrawableObject object = layer.getDraggableObjectInside(glX, glY);
                 if (object != null) {
@@ -86,7 +86,7 @@ public class DrawableScene {
                 if (mTouchObjectListener != null) {
                     mTouchObjectListener.onObjectDropped(obj);
                 }
-                obj.animateLoop(Const.NORMAL_STATE_ANIMATION);
+                obj.animateLoop(Const.NORMAL_ANIMATION_STATE);
             }
             mDraggableObjects.remove(e.getActionIndex());
             if (e.getAction() == MotionEvent.ACTION_UP) {
@@ -95,7 +95,7 @@ public class DrawableScene {
                     if (mTouchObjectListener != null) {
                         mTouchObjectListener.onObjectDropped(o);
                     }
-                    o.animateLoop(Const.NORMAL_STATE_ANIMATION);
+                    o.animateLoop(Const.NORMAL_ANIMATION_STATE);
                 }
                 mDraggableObjects.clear();
             }
@@ -161,7 +161,10 @@ public class DrawableScene {
      * Touch object listener.
      */
     public interface TouchObjectListener {
-        // Is called when object is dropped.
+        /**
+         * Object is dropped.
+         * @param object object that was dropped.
+         */
         void onObjectDropped(final DrawableObject object);
     }
 }

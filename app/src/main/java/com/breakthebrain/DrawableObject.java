@@ -12,6 +12,10 @@ import java.util.Map;
  * Drawable object class.
  */
 public class DrawableObject {
+    // Sprite type.
+    public static final int SQUARE_SPRITE = 0;
+    public static final int NORMAL_SPRITE = 1;
+
     // Object id.
     private int mId;
 
@@ -52,15 +56,19 @@ public class DrawableObject {
      * Drawable object constructor.
      * @param width width.
      * @param height height.
-     * @param scaleFactorX x scale factor.
-     * @param scaleFactorY y scale factor.
+     * @param type square type.
      */
-    public DrawableObject(final float width, final float height, final float scaleFactorX, final float scaleFactorY) {
+    public DrawableObject(final float width, final float height, final int type) {
         synchronized (mLock) {
             mId = IdGenerator.getId();
 
-            mWidth = width * scaleFactorX;
-            mHeight = height * scaleFactorY;
+            mWidth = width;
+            mHeight = height;
+
+            if (type == SQUARE_SPRITE) {
+                mWidth*= Game.getScreenXFactor();
+                mHeight*= Game.getScreenYFactor();
+            }
 
             mVertices = new float[]{
                     -mWidth / 2, -mHeight / 2,
@@ -145,12 +153,14 @@ public class DrawableObject {
                         }
                     }
                 }
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
+                if (texture != null) {
+                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
 
-                Matrix.setIdentityM(modelMatrix, 0);
-                Matrix.translateM(modelMatrix, 0, mX, mY, 0);
-                GLES20.glUniformMatrix4fv(matrixLocation, 1, false, modelMatrix, 0);
-                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, mBufferPos, 4);
+                    Matrix.setIdentityM(modelMatrix, 0);
+                    Matrix.translateM(modelMatrix, 0, mX, mY, 0);
+                    GLES20.glUniformMatrix4fv(matrixLocation, 1, false, modelMatrix, 0);
+                    GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, mBufferPos, 4);
+                }
             }
         }
     }
@@ -251,7 +261,7 @@ public class DrawableObject {
             if (!animationName.equals(mAnimationState)) {
                 mAnimationIndex = 0;
             }
-            mState = animationName;
+            mAnimationState = animationName;
             mLooped = true;
         }
     }

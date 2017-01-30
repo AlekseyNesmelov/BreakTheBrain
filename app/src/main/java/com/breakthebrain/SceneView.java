@@ -4,27 +4,30 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 
 /**
- * OpenGL Surface View.
+ * OpenGL GL Surface View.
  */
 public class SceneView extends GLSurfaceView {
     private SceneGLRenderer mRenderer;
-    private GameExitListener mGameExitListener;
 
+    /**
+     * Scene view constructor.
+     * @param context application context.
+     */
     public SceneView(final Context context) {
         super(context);
         init();
     }
 
+    /**
+     * Scene view constructor.
+     * @param context application context.
+     * @param attrs attribute set.
+     */
     public SceneView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         init();
-    }
-
-    public void setGameExitListener(final GameExitListener listener) {
-        mRenderer.setGameExitListener(listener);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class SceneView extends GLSurfaceView {
     }
 
     /**
-     * Initiates map view.
+     * Initiates scene view.
      */
     private void init() {
         setEGLContextClientVersion(2);

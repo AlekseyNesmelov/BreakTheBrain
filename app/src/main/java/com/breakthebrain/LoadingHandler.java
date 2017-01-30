@@ -20,8 +20,7 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
     private Context mContext;
     private int mLevelNumber = 1;
 
-    private Map<DrawableObject, Bitmap> mObjectsToLoadTextures = new HashMap<>();
-    private List<TextureTemplate> mObjectsToLoadAnimationTextures = new ArrayList<>();
+    private List<TextureTemplate> mTexturesToLoad = new ArrayList<>();
 
     long mAnimationTime = 0;
     float mCurMatX = 1;
@@ -35,10 +34,9 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public void processBeforeDraw(final int matrixLocation, final float[] matrix, final int colorLocation,
-                                  final float scaleFactorX, final float scaleFactorY) {
+    public void processBeforeDraw(final int matrixLocation, final float[] matrix) {
         final long time = System.currentTimeMillis();
-        if (time - mAnimationTime > 30) {
+        if (time - mAnimationTime > Const.LOADING_ANIMATION_DELAY) {
             if (mCurMatX > -1f) {
                 mMat.setX(mCurMatX);
                 mFirstNumber.setX(mCurFirstNumberX);
@@ -54,8 +52,7 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public void processAfterDraw(final int matrixLocation, final float[] matrix, final int colorLocation,
-                                 final float scaleFactorX, final float scaleFactorY) {
+    public void processAfterDraw(final int matrixLocation, final float[] matrix) {
     }
 
     @Override
@@ -71,15 +68,19 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public void initLevel() {
+    public void init() {
         mScene = new DrawableScene(1);
 
-        mMat = new DrawableObject(4, 2);
+        mMat = new DrawableObject(4, 2, DrawableObject.NORMAL_SPRITE);
         mMat.setX(mCurMatX);
         final Bitmap iconMat = Utils.getResizedBitmap(BitmapFactory.decodeResource(mContext.getResources(),
-                R.drawable.loading_mat_small), SceneGLRenderer.getScreenWidth(), SceneGLRenderer.getScreenHeight());
-        mObjectsToLoadTextures.put(mMat, iconMat);
+                R.drawable.loading_mat_small), Game.getScreenWidth(), Game.getScreenHeight());
+        final TextureTemplate matTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconMat, mMat);
+        mTexturesToLoad.add(matTemplate);
+        mScene.addToLayer(0, mMat);
 
+        // Numbers.
         final int textSize = 250;
         final Paint textPaint = new Paint();
         textPaint.setTextSize(textSize);
@@ -87,8 +88,8 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
         textPaint.setFakeBoldText(true);
         textPaint.setARGB(205, 0x00, 0x00, 0x00);
 
-        mFirstNumber = new DrawableObject(0.7f, 0.7f);
-        mFirstNumber.makeSquare();
+        // First number
+        mFirstNumber = new DrawableObject(0.7f, 0.7f, DrawableObject.SQUARE_SPRITE);
         mFirstNumber.setX(mCurFirstNumberX);
         final Bitmap iconFirstNumber = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(iconFirstNumber);
@@ -100,13 +101,14 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
             for (int i = 0; i < widths.length; i++) {
                 sum+= widths[i];
             }
-
             canvas.drawText(textNumber1, (iconFirstNumber.getWidth() - sum) / 2, (iconFirstNumber.getHeight() + textSize) / 2, textPaint);
         }
-        mObjectsToLoadTextures.put(mFirstNumber, iconFirstNumber);
+        final TextureTemplate firstNumberTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconFirstNumber, mFirstNumber);
+        mTexturesToLoad.add(firstNumberTemplate);
+        mScene.addToLayer(0, mFirstNumber);
 
-        mSecondNumber = new DrawableObject(0.8f, 0.8f);
-        mSecondNumber.makeSquare();
+        mSecondNumber = new DrawableObject(0.8f, 0.8f, DrawableObject.SQUARE_SPRITE);
         mSecondNumber.setX(mCurSecondNumberX);
         final Bitmap iconSecondNumber = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(iconSecondNumber);
@@ -118,16 +120,10 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
             sum+= widths[i];
         }
         canvas.drawText(textNumber2, (iconSecondNumber.getWidth() - sum) / 2, (iconSecondNumber.getHeight() + textSize) / 2, textPaint);
-        mObjectsToLoadTextures.put(mSecondNumber, iconSecondNumber);
-
-        mScene.addToLayer(0, mMat);
-        mScene.addToLayer(0, mFirstNumber);
+        final TextureTemplate secondNumberTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
+                iconSecondNumber, mSecondNumber);
+        mTexturesToLoad.add(secondNumberTemplate);
         mScene.addToLayer(0, mSecondNumber);
-    }
-
-    @Override
-    public void callLoaded() {
-        mLevelListener.onLoadingLoaded();
     }
 
     @Override
@@ -136,12 +132,7 @@ public class LoadingHandler implements SceneHolder.SceneHolderHandler {
     }
 
     @Override
-    public Map<DrawableObject, Bitmap> getObjectsToLoadTextures() {
-        return mObjectsToLoadTextures;
-    }
-
-    @Override
-    public List<TextureTemplate> getObjectsToLoadAnimationTextures() {
-        return mObjectsToLoadAnimationTextures;
+    public List<TextureTemplate> getTexturesToLoad() {
+        return mTexturesToLoad;
     }
 }

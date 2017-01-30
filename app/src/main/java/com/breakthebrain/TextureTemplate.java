@@ -1,6 +1,7 @@
 package com.breakthebrain;
 
 import android.graphics.Bitmap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,22 @@ public class TextureTemplate {
         mType = type;
         mBitmap = bitmap;
         mOwners = owners;
+    }
+
+    /**
+     * Texture template constructor.
+     * @param name animation name.
+     * @param type type of template.
+     * @param bitmap bitmap to load texture.
+     * @param owner animation owner.
+     */
+    public TextureTemplate(final String name, final int type,
+                           final Bitmap bitmap, final DrawableObject owner) {
+        mName = name;
+        mType = type;
+        mBitmap = bitmap;
+        mOwners = new ArrayList<>();
+        mOwners.add(owner);
     }
 
     /**

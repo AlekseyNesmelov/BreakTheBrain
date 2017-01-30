@@ -4,26 +4,48 @@ package com.breakthebrain;
  * Game events listener.
  */
 public interface GameListener {
-    // Level loading completed.
+    /**
+     * Level loading completed.
+     */
     void onLevelLoaded();
-    // Level mistake.
+
+    /**
+     * Level mistake.
+     */
     void onLevelMistake();
-    // Level completed.
+
+    /**
+     * Level completed.
+     */
     void onLevelCompleted();
-    // Return to menu from level.
+
+    /**
+     * Return to menu from level.
+     */
     void onReturnToMenu();
-    // Start button pressed.
+
+    /**
+     * Start button pressed.
+     */
     void onStartButtonPressed();
-    // Menu loaded.
+
+    /**
+     * Menu loaded.
+     */
     void onMenuLoaded();
-    // Loading menu loaded.
-    void onLoadingLoaded();
-    // Loading completed.
+
+    /**
+     * Loading completed.
+     */
     void onLoadingCompleted();
-    // Key pressed.
+
+    /**
+     * Key pressed.
+     */
     void onKeyPressed();
-    // To next level.
+
+    /**
+     * To next level.
+     */
     void onNextLevel();
-    // Exit game.
-    void onExit();
 }

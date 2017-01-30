@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends AppCompatActivity implements GameExitListener{
-
-    SceneView mSceneView;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,13 +15,5 @@ public class MainActivity extends AppCompatActivity implements GameExitListener{
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
-
-        mSceneView = (SceneView) findViewById(R.id.view);
-        mSceneView.setGameExitListener(this);
-    }
-
-    @Override
-    public void onExit() {
-        finish();
     }
 }

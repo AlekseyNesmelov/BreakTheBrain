@@ -21,8 +21,7 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
     private GameListener mLevelListener;
     private Context mContext;
 
-    private Map<DrawableObject, Bitmap> mObjectsToLoadTextures = new HashMap<>();
-    private List<TextureTemplate> mObjectsToLoadAnimationTextures = new ArrayList<>();
+    private List<TextureTemplate> mTexturesToLoad = new ArrayList<>();
 
     public LevelHandler2(final Context context, final GameListener levelListener) {
         mContext = context;
@@ -30,12 +29,11 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
     }
 
     @Override
-    public void processBeforeDraw(final int matrixLocation, final float[] matrix, final int colorLocation,
-                                  final float scaleFactorX, final float scaleFactorY) {
+    public void processBeforeDraw(final int matrixLocation, final float[] matrix) {
     }
 
     @Override
-    public void processAfterDraw(int matrixLocation, float[] matrix, int colorLocation, float scaleFactorX, float scaleFactorY) {
+    public void processAfterDraw(int matrixLocation, float[] matrix) {
     }
 
     @Override
@@ -51,9 +49,9 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
     }
 
     @Override
-    public void initLevel() {
+    public void init() {
         mScene = new DrawableScene(1);
-        mScene.setTouchObjectListener(this);
+        /*mScene.setTouchObjectListener(this);
 
         mMat = new DrawableObject(2, 2);
         final Bitmap iconMat = Utils.getResizedBitmap(BitmapFactory.decodeResource(mContext.getResources(),
@@ -147,12 +145,7 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
         mWord.setX(0.26f);
         final Bitmap iconWord = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.level2_word_penguin);
         mObjectsToLoadTextures.put(mWord, iconWord);
-        mScene.addToLayer(0, mWord);
-    }
-
-    @Override
-    public void callLoaded() {
-        mLevelListener.onLevelLoaded();
+        mScene.addToLayer(0, mWord);*/
     }
 
     @Override
@@ -161,18 +154,13 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
     }
 
     @Override
-    public Map<DrawableObject, Bitmap> getObjectsToLoadTextures() {
-        return mObjectsToLoadTextures;
-    }
-
-    @Override
-    public List<TextureTemplate> getObjectsToLoadAnimationTextures() {
-        return mObjectsToLoadAnimationTextures;
+    public List<TextureTemplate> getTexturesToLoad() {
+        return mTexturesToLoad;
     }
 
     @Override
     public void onObjectDropped(final DrawableObject object) {
-        if (object.equals(mPenguinRed)) {
+        /*if (object.equals(mPenguinRed)) {
             if (mHouseRed.isInside(mPenguinRed.getX(), mPenguinRed.getY())) {
                 mPenguinRed.setVisible(false);
                 mHouseRed.animateLoop("in");
@@ -206,6 +194,7 @@ public class LevelHandler2 implements SceneHolder.SceneHolderHandler, DrawableSc
         }
         if (!mPenguinRed.isVisible() && !mPenguinGreen.isVisible() && !mWord.isVisible()) {
             mLevelListener.onLevelCompleted();
-        }
+        }*/
+
     }
 }
