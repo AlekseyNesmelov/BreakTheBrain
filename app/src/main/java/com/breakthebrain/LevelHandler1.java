@@ -141,6 +141,7 @@ public class LevelHandler1 implements SceneHolder.SceneHolderHandler, DrawableSc
 
     @Override
     public void onObjectDropped(final DrawableObject object) {
+        SoundPlayer.playDragSound(mContext);
         if (object.equals(mPenguinRed)) {
             if (mHouseRed.isInside(mPenguinRed.getX(), mPenguinRed.getY())) {
                 mPenguinRed.setVisible(false);

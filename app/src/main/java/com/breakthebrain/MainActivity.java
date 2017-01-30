@@ -16,4 +16,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SoundPlayer.playBackgroundMusic(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SoundPlayer.stopBackgroundMusic(this);
+    }
 }

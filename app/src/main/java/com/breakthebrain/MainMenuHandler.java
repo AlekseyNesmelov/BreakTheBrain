@@ -52,7 +52,9 @@ public class MainMenuHandler implements SceneHolder.SceneHolderHandler {
             mExitButton.setState(Const.NORMAL_STATE);
             if (mIsStartPressed && mStartButton.isInside(glX, glY)) {
                 mLevelListener.onStartButtonPressed();
+                SoundPlayer.playClickSound(mContext);
             } else if (mIsExitPressed && mExitButton.isInside(glX, glY)) {
+                SoundPlayer.playClickSound(mContext);
                 ((AppCompatActivity)mContext).finish();
             }
             mIsStartPressed = false;

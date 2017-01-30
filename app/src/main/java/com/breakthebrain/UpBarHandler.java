@@ -82,12 +82,15 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
             mNextButton.setState(Const.NORMAL_STATE);
             if (mNextButton.isVisible()) {
                 if (mIsNextPressed && mNextButton.isInside(glX, glY)) {
+                    SoundPlayer.playClickSound(mContext);
                     mLevelListener.onNextLevel();
                 }
             } else {
                 if (mIsBackPressed && mBackButton.isInside(glX, glY)) {
+                    SoundPlayer.playClickSound(mContext);
                     mLevelListener.onReturnToMenu();
                 } else if (mIsKeyPressed && mKeyButton.isInside(glX, glY)) {
+                    SoundPlayer.playClickSound(mContext);
                     mLevelListener.onKeyPressed();
                 }
             }
@@ -107,6 +110,7 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
         if (prevLivesCount > mLivesCount) {
             mRedScreenScreenTimeCount = System.currentTimeMillis();
             mRedScreen.setVisible(true);
+            SoundPlayer.playMistakeSound(mContext);
         }
 
         for (int i = Const.MIN_LIVES_COUNT; i < mLivesCount; i++) {
@@ -123,6 +127,7 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
     public void levelCompleted() {
         mCompletedScreen.setVisible(true);
         mNextButton.setVisible(true);
+        SoundPlayer.playWinSound(mContext);
     }
 
     /**
