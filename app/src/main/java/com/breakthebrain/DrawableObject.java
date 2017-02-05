@@ -134,11 +134,11 @@ public class DrawableObject {
      */
     public void draw(final int matrixLocation, final float[] modelMatrix) {
         synchronized (mLock) {
-            if (mVisible && !mState.equals(Const.EMPTY_STATE)) {
+            if (mVisible) {
                 Integer texture = mTextures.get(mState);
                 if (!mAnimationState.equals(Const.EMPTY_STATE)) {
                     final List<Integer> animationTexture = mAnimations.get(mAnimationState);
-                    if (animationTexture != null) {
+                    if (animationTexture != null && 0 <= mAnimationIndex && mAnimationIndex < animationTexture.size()) {
                         texture = animationTexture.get(mAnimationIndex);
                         final long time = System.currentTimeMillis();
                         if (time - mAnimationTime > Const.ANIMATION_DELAY) {

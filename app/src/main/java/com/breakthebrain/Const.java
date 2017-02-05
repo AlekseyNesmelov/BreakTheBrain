@@ -14,8 +14,9 @@ public class Const {
 
     // State numbers.
     public static final int STATE_MAIN_MENU = 0;
-    public static final int STATE_LOADING = 1;
+    public static final int STATE_CHANGE_LEVEL = 1;
     public static final int STATE_LEVEL = 2;
+    public static final int STATE_LOADING = 3;
 
     // Empty drawable object state.
     public static final String EMPTY_STATE = "";

@@ -39,7 +39,6 @@ public class SceneGLRenderer implements GLSurfaceView.Renderer {
      */
     public SceneGLRenderer(final Context context) {
         mContext = context;
-        mGame = new Game(mContext, mLock);
     }
 
     @Override
@@ -60,12 +59,14 @@ public class SceneGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(mProgramId);
         prepareBuffers();
         bindData();
+        mGame = new Game(mContext, mLock);
     }
 
     @Override
     public void onSurfaceChanged(final GL10 arg0, final int width, final int height) {
         GLES20.glViewport(0, 0, width, height);
         mGame.recalculateProjection(width, height);
+        mGame.setUpGame();
     }
 
     /**

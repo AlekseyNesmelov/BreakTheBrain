@@ -20,11 +20,14 @@ public class Game implements GameListener{
     private static float mScreenWidth = 240;
     private static float mScreenHeight = 320;
 
+    private LoadingHandler mLoadingHandler;
+    private SceneHolder mLoading;
+
     private MainMenuHandler mMainMenuHandler;
     private SceneHolder mMainMenu;
 
-    private LoadingHandler mLoadingHandler;
-    private SceneHolder mLoading;
+    private ChangeLevelHandler mChangeLevelHandler;
+    private SceneHolder mChangeLevel;
 
     private UpBarHandler mUpBarHandler;
     private SceneHolder mUpBar;
@@ -37,7 +40,7 @@ public class Game implements GameListener{
     private int[] mTexturesToRemove;
 
     private boolean mIsStateChanged = true;
-    private int mState = Const.STATE_MAIN_MENU;
+    private int mState = Const.STATE_LOADING;
 
     private Object mLock;
     private Context mContext;
@@ -45,6 +48,7 @@ public class Game implements GameListener{
     private static int mLifeCount = 5;
     private static int mCoinCount = 100;
 
+    private GameThread mGameThread;
     /**
      * Game constructor.
      * @param context application context.
@@ -53,7 +57,18 @@ public class Game implements GameListener{
     public Game(final Context context, final Object lock) {
         mContext = context;
         mLock = lock;
-        //: TODO get lifes and coins from storage.
+    }
+
+    /**
+     * Sets up game.
+     */
+    public void setUpGame() {
+        mLoadingHandler = new LoadingHandler(mContext, this);
+        mLoading = new SceneHolder(mLoadingHandler);
+        mTexturesToLoad = mLoadingHandler.getTexturesToLoad();
+        mIsStateChanged = true;
+        mGameThread = new GameThread(Const.STATE_MAIN_MENU);
+        mGameThread.start();
     }
 
     /**
@@ -149,20 +164,17 @@ public class Game implements GameListener{
             textureCoordinates.clear();
             switch (mState) {
                 case Const.STATE_MAIN_MENU:
-                    mMainMenuHandler = new MainMenuHandler(mContext, this);
-                    mMainMenu = new SceneHolder(mMainMenuHandler);
-                    mTexturesToLoad = mMainMenuHandler.getTexturesToLoad();
                     mMainMenu.putToBuffer(0, vertexData, textureCoordinates);
                     break;
-                case Const.STATE_LOADING:
-                    mLoadingHandler = new LoadingHandler(mContext, this, mLevelNumber);
-                    mLoading = new SceneHolder(mLoadingHandler);
-                    mTexturesToLoad = mLoadingHandler.getTexturesToLoad();
-                    mLoading.putToBuffer(0, vertexData, textureCoordinates);
+                case Const.STATE_CHANGE_LEVEL:
+                    mChangeLevel.putToBuffer(0, vertexData, textureCoordinates);
                     break;
                 case Const.STATE_LEVEL:
                     int pos = mLevel.putToBuffer(0, vertexData, textureCoordinates);
                     mUpBar.putToBuffer(pos, vertexData, textureCoordinates);
+                    break;
+                case Const.STATE_LOADING:
+                    mLoading.putToBuffer(0, vertexData, textureCoordinates);
                     break;
                 default:
                     break;
@@ -219,12 +231,15 @@ public class Game implements GameListener{
             case Const.STATE_MAIN_MENU:
                 mMainMenu.draw(matrixLocation, matrix);
                 break;
-            case Const.STATE_LOADING:
-                mLoading.draw(matrixLocation, matrix);
+            case Const.STATE_CHANGE_LEVEL:
+                mChangeLevel.draw(matrixLocation, matrix);
                 break;
             case Const.STATE_LEVEL:
                 mLevel.draw(matrixLocation, matrix);
                 mUpBar.draw(matrixLocation, matrix);
+                break;
+            case Const.STATE_LOADING:
+                mLoading.draw(matrixLocation, matrix);
                 break;
             default:
                 break;
@@ -308,18 +323,8 @@ public class Game implements GameListener{
     @Override
     public void onReturnToMenu() {
         synchronized (mLock) {
-            final int[] upBarTextures = mUpBarHandler.getScene().getTextures();
-            final int[] levelTextures = mLevelHandler.getScene().getTextures();
-            int c = 0;
-            mTexturesToRemove = new int[upBarTextures.length + levelTextures.length];
-            for (int i = 0; i < upBarTextures.length; i++) {
-                mTexturesToRemove[c++] = upBarTextures[i];
-            }
-            for (int i = 0; i < levelTextures.length; i++) {
-                mTexturesToRemove[c++] = levelTextures[i];
-            }
-            mState = Const.STATE_MAIN_MENU;
-            mIsStateChanged = true;
+            mGameThread = new GameThread(Const.STATE_MAIN_MENU);
+            mGameThread.start();
         }
     }
 
@@ -327,8 +332,8 @@ public class Game implements GameListener{
     public void onStartButtonPressed() {
         synchronized (mLock) {
             mTexturesToRemove = mMainMenuHandler.getScene().getTextures();
-            mState = Const.STATE_LOADING;
-            mIsStateChanged = true;
+            mGameThread = new GameThread(Const.STATE_CHANGE_LEVEL);
+            mGameThread.start();
         }
     }
 
@@ -340,23 +345,6 @@ public class Game implements GameListener{
     @Override
     public void onLoadingCompleted() {
         synchronized (mLock) {
-            mTexturesToRemove = mLoadingHandler.getScene().getTextures();
-            mUpBarHandler = new UpBarHandler(mContext, this);
-            mUpBar = new SceneHolder(mUpBarHandler);
-            switch (mLevelNumber) {
-                case 1:
-                    mLevelHandler = new LevelHandler1(mContext, this);
-                    mLevel = new SceneHolder(mLevelHandler);
-                    break;
-                case 2:
-                    mLevelHandler = new LevelHandler2(mContext, this);
-                    mLevel = new SceneHolder(mLevelHandler);
-                    break;
-                default:
-                    break;
-            }
-            mTexturesToLoad = mLevelHandler.getTexturesToLoad();
-            mTexturesToLoad.addAll(mUpBarHandler.getTexturesToLoad());
             mState = Const.STATE_LEVEL;
             mIsStateChanged = true;
         }
@@ -371,18 +359,101 @@ public class Game implements GameListener{
     public void onNextLevel() {
         synchronized (mLock) {
             mLevelNumber++;
-            final int[] upBarTextures = mUpBarHandler.getScene().getTextures();
-            final int[] levelTextures = mLevelHandler.getScene().getTextures();
-            int c = 0;
-            mTexturesToRemove = new int[upBarTextures.length + levelTextures.length];
-            for (int i = 0; i < upBarTextures.length; i++) {
-                mTexturesToRemove[c++] = upBarTextures[i];
-            }
-            for (int i = 0; i < levelTextures.length; i++) {
-                mTexturesToRemove[c++] = levelTextures[i];
-            }
+            mGameThread = new GameThread(Const.STATE_CHANGE_LEVEL);
+            mGameThread.start();
+        }
+    }
+
+    private class GameThread extends Thread {
+        private int mStateToLoad = Const.STATE_LOADING;
+        private long mStartTime;
+        public GameThread (final int state) {
             mState = Const.STATE_LOADING;
             mIsStateChanged = true;
+            mStateToLoad = state;
+            mStartTime = System.currentTimeMillis();
+        }
+        @Override
+        public void run() {
+            int size = 0;
+            int[] changeLevelTextures = null;
+            if (mChangeLevelHandler != null) {
+                changeLevelTextures = mChangeLevelHandler.getScene().getTextures();
+                size+= changeLevelTextures.length;
+            }
+            int[] mainMenuTextures = null;
+            if (mMainMenuHandler != null) {
+                mainMenuTextures = mMainMenuHandler.getScene().getTextures();
+                size+= mainMenuTextures.length;
+            }
+            int[] upBarTextures = null;
+            if (mUpBarHandler != null) {
+                upBarTextures = mUpBarHandler.getScene().getTextures();
+                size+= upBarTextures.length;
+            }
+            int[] levelTextures = null;
+            if (mLevelHandler != null) {
+                levelTextures =  mLevelHandler.getScene().getTextures();
+                size+= levelTextures.length;
+            }
+
+            int c = 0;
+            mTexturesToRemove = new int[size];
+            if (changeLevelTextures != null) {
+                for (int i = 0; i < changeLevelTextures.length; i++) {
+                    mTexturesToRemove[c++] = changeLevelTextures[i];
+                }
+            }
+            if (mainMenuTextures != null) {
+                for (int i = 0; i < mainMenuTextures.length; i++) {
+                    mTexturesToRemove[c++] = mainMenuTextures[i];
+                }
+            }
+            if (upBarTextures != null) {
+                for (int i = 0; i < upBarTextures.length; i++) {
+                    mTexturesToRemove[c++] = upBarTextures[i];
+                }
+            }
+            if (levelTextures != null) {
+                for (int i = 0; i < levelTextures.length; i++) {
+                    mTexturesToRemove[c++] = levelTextures[i];
+                }
+            }
+
+            switch (mStateToLoad) {
+                case Const.STATE_MAIN_MENU:
+                    mMainMenuHandler = new MainMenuHandler(mContext, Game.this);
+                    mMainMenu = new SceneHolder(mMainMenuHandler);
+                    mTexturesToLoad = mMainMenuHandler.getTexturesToLoad();
+                    break;
+                case Const.STATE_CHANGE_LEVEL:
+                    mChangeLevelHandler = new ChangeLevelHandler(mContext, Game.this, mLevelNumber);
+                    mChangeLevel = new SceneHolder(mChangeLevelHandler);
+                    mUpBarHandler = new UpBarHandler(mContext, Game.this);
+                    mUpBar = new SceneHolder(mUpBarHandler);
+                    switch (mLevelNumber) {
+                        case 1:
+                            mLevelHandler = new LevelHandler1(mContext, Game.this);
+                            break;
+                        case 2:
+                            mLevelHandler = new LevelHandler2(mContext, Game.this);
+                            break;
+                        default:
+                            break;
+                    }
+                    mLevel = new SceneHolder(mLevelHandler);
+                    mTexturesToLoad = mChangeLevelHandler.getTexturesToLoad();
+                    mTexturesToLoad.addAll(mLevelHandler.getTexturesToLoad());
+                    mTexturesToLoad.addAll(mUpBarHandler.getTexturesToLoad());
+                    break;
+                default:
+                    break;
+            }
+            while (System.currentTimeMillis() - mStartTime < 1000) {}
+            synchronized (mLock) {
+                mState = mStateToLoad;
+                mIsStateChanged = true;
+            }
         }
     }
 }
