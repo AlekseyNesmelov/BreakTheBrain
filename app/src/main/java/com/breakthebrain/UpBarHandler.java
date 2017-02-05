@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpBarHandler implements SceneHolder.SceneHolderHandler {
-    private int mLivesCount;
-    private int mCoinCount;
     private DrawableScene mScene;
     private DrawableObject mMat;
     private List<DrawableObject> mHearts;
@@ -39,8 +37,6 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
     public UpBarHandler(final Context context, final GameListener levelListener) {
         mContext = context;
         mLevelListener = levelListener;
-        mLivesCount = 5;
-        mCoinCount = 100;
     }
 
     @Override
@@ -103,20 +99,18 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
     /**
      * Sets lives count.
      * @param livesCount lives count tot set.
+     * @param showFail true if needs to show fail screen animation.
      */
-    public void setLivesCount(final int livesCount) {
-        final int prevLivesCount = mLivesCount;
-        mLivesCount = Math.max(Const.MIN_LIVES_COUNT, Math.min(livesCount, Const.MAX_LIVES_COUNT));
-        if (prevLivesCount > mLivesCount) {
+    public void setLivesCount(final int livesCount, final boolean showFail) {
+        if (showFail) {
             mRedScreenScreenTimeCount = System.currentTimeMillis();
             mRedScreen.setVisible(true);
             SoundPlayer.playMistakeSound(mContext);
         }
-
-        for (int i = Const.MIN_LIVES_COUNT; i < mLivesCount; i++) {
+        for (int i = Const.MIN_LIVES_COUNT; i < livesCount; i++) {
             mHearts.get(i).setVisible(true);
         }
-        for (int i = mLivesCount; i < Const.MAX_LIVES_COUNT; i++) {
+        for (int i = livesCount; i < Const.MAX_LIVES_COUNT; i++) {
             mHearts.get(i).setVisible(false);
         }
     }
@@ -128,14 +122,6 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
         mCompletedScreen.setVisible(true);
         mNextButton.setVisible(true);
         SoundPlayer.playWinSound(mContext);
-    }
-
-    /**
-     * Gets lives count.
-     * @return lives count.
-     */
-    public int getLivesCount() {
-        return mLivesCount;
     }
 
     @Override
@@ -251,7 +237,7 @@ public class UpBarHandler implements SceneHolder.SceneHolderHandler {
         final Bitmap iconCoin = Utils.getResizedBitmap(BitmapFactory.decodeResource(mContext.getResources(),
                 R.drawable.coin), 200, 200);
         final Canvas canvas = new Canvas(iconCoin);
-        canvas.drawText(mCoinCount + "", 30, 130, textPaint);
+        canvas.drawText(Game.getCoinCount() + "", 30, 130, textPaint);
         final TextureTemplate coinTemplate = new TextureTemplate(Const.NORMAL_STATE, TextureTemplate.SIMPLE_TEXTURE,
                 iconCoin, mCoin);
         mTexturesToLoad.add(coinTemplate);

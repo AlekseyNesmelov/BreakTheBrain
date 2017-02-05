@@ -42,8 +42,8 @@ public class Game implements GameListener{
     private Object mLock;
     private Context mContext;
 
-    private int mLifeCount = 5;
-    private int mCoinCount = 100;
+    private static int mLifeCount = 5;
+    private static int mCoinCount = 100;
 
     /**
      * Game constructor.
@@ -104,6 +104,38 @@ public class Game implements GameListener{
      */
     public static float getScreenYFactor() {
         return mScaleFactorY;
+    }
+
+    /**
+     * Gets life count.
+     * @return life count.
+     */
+    public static int getLifeCount() {
+        return mLifeCount;
+    }
+
+    /**
+     * Gets coin count.
+     * @return coin count.
+     */
+    public static int getCoinCount() {
+        return mCoinCount;
+    }
+
+    /**
+     * Set life count.
+     * @param count count tot set.
+     */
+    public static void setLifeCount(final int count) {
+        mLifeCount = count;
+    }
+
+    /**
+     * Sets coin count.
+     * @param count count tot set.
+     */
+    public static void setCoinCount(final int count) {
+        mCoinCount = count;
     }
 
     /**
@@ -262,7 +294,10 @@ public class Game implements GameListener{
 
     @Override
     public void onLevelMistake() {
-        mUpBarHandler.setLivesCount(--mLifeCount);
+        final int prevLife = mLifeCount;
+        mLifeCount--;
+        mLifeCount = Math.max(Const.MIN_LIVES_COUNT, Math.min(mLifeCount, Const.MAX_LIVES_COUNT));
+        mUpBarHandler.setLivesCount(mLifeCount, prevLife > mLifeCount);
     }
 
     @Override

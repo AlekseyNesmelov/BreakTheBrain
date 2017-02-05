@@ -20,8 +20,7 @@ import javax.microedition.khronos.opengles.GL10;
  * OpenGL renderer class.
  */
 public class SceneGLRenderer implements GLSurfaceView.Renderer {
-    Game mGame;
-
+    private Game mGame;
     private Context mContext;
     private FloatBuffer mVertexData;
     private FloatBuffer mTextureCoordinates;
@@ -77,18 +76,6 @@ public class SceneGLRenderer implements GLSurfaceView.Renderer {
         mGame.touchEvent(e);
     }
 
-   /* public void loadMainMenu() {
-        //: TODO get coins and life count from storage.
-        synchronized (mLock) {
-            mUpBarHandler = new UpBarHandler(mContext, this, 5, 100);
-            mUpBar = new SceneHolder(mUpBarHandler);
-
-            mMainMenuHandler = new MainMenuHandler(mContext, this);
-            mMainMenu = new SceneHolder(mMainMenuHandler);
-        }
-    }*/
-
-
     /**
      * Prepares buffers.
      */
@@ -126,128 +113,5 @@ public class SceneGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glUniform1i(mUTextureUnitLocation, 0);
     }
-
-    /*
-    @Override
-    public void onLevelLoaded() {
-        synchronized (mLock) {
-            mUpBarHandler.toDefaultState();
-            mState = 2;
-            mObjectsToLoadTextures.clear();
-            mTexturesToLoad.clear();
-            mObjectsToLoadTextures = mLevelHandler.getObjectsToLoadTextures();
-            mTexturesToLoad = mLevelHandler.getObjectsToLoadAnimationTextures();
-            mIsStateChanged = true;
-        }
-    }
-
-    @Override
-    public void onLevelMistake() {
-        if (mUpBarHandler.getLivesCount() > 0) {
-            mUpBarHandler.setLivesCount(mUpBarHandler.getLivesCount() - 1);
-        } else if (mUpBarHandler.getLivesCount() == 0) {
-
-        }
-    }
-
-    @Override
-    public void onLevelCompleted() {
-        mUpBarHandler.levelCompleted();
-    }
-
-    @Override
-    public void onLevelRestarted() {
-
-    }
-
-    @Override
-    public void onReturnToMenu() {
-        synchronized (mLock) {
-            if (mLevelHandler != null) {
-                mTexturesToRemove = mLevelHandler.getScene().getTextures();
-            }
-            mState = Const.STATE_MAIN_MENU;
-            mIsStateChanged = true;
-        }
-    }
-
-    @Override
-    public void onMenuClosed() {
-
-    }
-
-    @Override
-    public void onStartButtonPressed() {
-        mLoadingHandler = new LoadingHandler(mContext, this, mLevelNumber);
-        mLoading = new SceneHolder(mLoadingHandler);
-        mLoadingHandler.callLoaded();
-    }
-
-    @Override
-    public void onMenuLoaded() {
-        synchronized (mLock) {
-            mState = 0;
-            mObjectsToLoadTextures.clear();
-            mTexturesToLoad.clear();
-            mObjectsToLoadTextures = mMainMenuHandler.getObjectsToLoadTextures();
-            mTexturesToLoad = mMainMenuHandler.getObjectsToLoadAnimationTextures();
-            mObjectsToLoadTextures.putAll(mUpBarHandler.getObjectsToLoadTextures());
-            mTexturesToLoad.addAll(mUpBarHandler.getObjectsToLoadAnimationTextures());
-            mIsStateChanged = true;
-        }
-    }
-
-    @Override
-    public void onLoadingLoaded() {
-        synchronized (mLock) {
-            mState = 1;
-            mObjectsToLoadTextures.clear();
-            mTexturesToLoad.clear();
-            mObjectsToLoadTextures = mLoadingHandler.getObjectsToLoadTextures();
-            mTexturesToLoad = mLoadingHandler.getObjectsToLoadAnimationTextures();
-            mIsStateChanged = true;
-        }
-    }
-
-    @Override
-    public void onLoadingCompleted() {
-        if (mLevelHandler != null) {
-            mTexturesToRemove = mLevelHandler.getScene().getTextures();
-        }
-        switch (mLevelNumber) {
-            case 1:
-                mLevelHandler = new LevelHandler1(mContext, this);
-                mLevel = new SceneHolder(mLevelHandler);
-                mLevelHandler.callLoaded();
-                break;
-            case 2:
-                mLevelHandler = new LevelHandler2(mContext, this);
-                mLevel = new SceneHolder(mLevelHandler);
-                mLevelHandler.callLoaded();
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onKeyPressed() {
-
-    }
-
-    @Override
-    public void onNextLevel() {
-        synchronized (mLock) {
-            mLevelNumber++;
-            onStartButtonPressed();
-        }
-    }
-
-    @Override
-    public void onExit() {
-        if (mGameExitListener != null) {
-            mGameExitListener.onExit();
-        }
-    }*/
 }
 
